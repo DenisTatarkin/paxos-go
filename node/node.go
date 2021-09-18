@@ -2,6 +2,7 @@ package node
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -18,7 +19,8 @@ type Acceptor struct{
 }
 
 func ParseConfig(filename string) ([]Proposer, []Acceptor) {
-	var f,_= os.Open(filename)
+	var f,err = os.Open(filename); if err!=nil{fmt.Println(err.Error()); return nil,nil}; if f == nil{fmt.Println("No config file"); return nil,nil}
+	defer f.Close()
 	var scanner = bufio.NewScanner(f)
 	var proposers[] Proposer
 	var acceptors[] Acceptor
