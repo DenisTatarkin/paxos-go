@@ -3,6 +3,7 @@ package node
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -53,4 +54,9 @@ func ParseConfig(filename string) ([]Proposer, []Acceptor) {
 	}
 
 	return proposers, acceptors
+}
+
+func Message(address string, content string, ch chan<- bool) {
+	_, err := http.Get(address + "/" + content)
+	ch <- err == nil
 }
