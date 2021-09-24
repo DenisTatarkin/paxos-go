@@ -1,22 +1,23 @@
 package main
 
 import (
-	"../node"
 	"bufio"
 	"fmt"
+	"hash/fnv"
 	"log"
 	"net/http"
 	"os"
+	"paxos-go/node"
 	"strings"
 )
 
-var proposers[] node.Proposer
-var acceptors[] node.Acceptor
+var proposers []node.Proposer
+var acceptors []node.Acceptor
 var id string
 var leader = false
 var address string
 
-func main(){
+func main() {
 	var port = os.Args[1]
 	id = os.Args[2]
 
@@ -24,6 +25,8 @@ func main(){
 
 	configureHandlers(port)
 
+	//todo: this function should be executed after all proposers connected.
+	//So should be implemented console command "start" or ssomething like that
 	checkIfLeader()
 
 	go manage()
@@ -33,7 +36,7 @@ func main(){
 	log.Fatal(http.ListenAndServe(address, nil))
 }
 
-func configureHandlers(port string){
+func configureHandlers(port string) {
 	http.HandleFunc("/", requestHandler)
 }
 
@@ -45,33 +48,54 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	var value = reqBody[1]
 
 	if role == "client" {
-		if leader{
+		if leader {
 			clientHandler(key, value)
-		}
-		else{
-			ch := make(chan <- bool)
-			go node.Message("leader", key + "=" + value, ch)
-			//todo send to leader
+		} else {
+			ch := make(chan bool)
+			go node.Message("leader", key+"="+value, ch)
+			//todo: send to leader
+			access := <-ch
+			if !access {
+				fmt.Println("Err")
+			}
 		}
 	}
 }
 
 func clientHandler(key string, value string) {
-	for _,acceptor := range acceptors{
+	for _, acceptor := range acceptors {
 		var ch = make(chan bool)
-		go node.Message(acceptor.Address, key + "=" + value, ch)
-		access:= <-ch; if !access {fmt.Println("Err")}
+		go node.Message(acceptor.Address, key+"="+value, ch)
+		access := <-ch
+		if !access {
+			fmt.Println("Err")
+		}
 	}
 }
 
-func manage(){
+func manage() {
 	var scanner = bufio.NewScanner(os.Stdin)
 
-	for scanner.Scan(){
+	for scanner.Scan() {
 
 	}
 }
 
 func checkIfLeader() {
-	//todo
+	h := fnv.New32a()
+	h.Write([]byte(address))
+	my := h.Sum32()
+	for _, proposer := range proposers {
+		if address == proposer.Address {
+			return
+		}
+		h.Write([]byte(proposer.Address))
+		hash := h.Sum32()
+		if my < hash {
+			return
+		}
+	}
+	leader = true
+	fmt.Println("This node is leader\n")
+	return
 }
