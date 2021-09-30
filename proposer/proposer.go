@@ -53,8 +53,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 			clientHandler(key, value)
 		} else {
 			ch := make(chan bool)
-			go node.Message("leader", key+"="+value, ch)
-			//todo: send to leader
+			go node.Message(leader.Address, key+"="+value, ch)
 			access := <-ch
 			if !access {
 				fmt.Println("Err")
