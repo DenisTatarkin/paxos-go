@@ -14,7 +14,8 @@ import (
 var proposers []node.Proposer
 var acceptors []node.Acceptor
 var id string
-var leader = false
+var leader node.Proposer
+var iLeader = false
 var address string
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 
 	//todo: this function should be executed after all proposers connected.
 	//So should be implemented console command "start" or ssomething like that
-	checkIfLeader()
+	electLeader()
 
 	go manage()
 
@@ -48,7 +49,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	var value = reqBody[1]
 
 	if role == "client" {
-		if leader {
+		if iLeader {
 			clientHandler(key, value)
 		} else {
 			ch := make(chan bool)
@@ -81,21 +82,26 @@ func manage() {
 	}
 }
 
-func checkIfLeader() {
+func electLeader() {
 	h := fnv.New32a()
-	h.Write([]byte(address))
-	my := h.Sum32()
+	var hashesProposers []node.Proposer = make([]node.Proposer, len(proposers))
+
 	for _, proposer := range proposers {
-		if address == proposer.Address {
-			return
-		}
 		h.Write([]byte(proposer.Address))
-		hash := h.Sum32()
-		if my < hash {
-			return
+		hash := (int)(h.Sum32()) % len(proposers)
+		hashesProposers[hash] = proposer
+	}
+
+	for _, proposer := range hashesProposers {
+		if &proposer != nil {
+			leader = proposer
+			break
 		}
 	}
-	leader = true
-	fmt.Println("This node is leader\n")
-	return
+
+	iLeader = leader.Address == address
+	if leader.Address == address {
+		iLeader = true
+		fmt.Println("This node is leader\n")
+	}
 }
