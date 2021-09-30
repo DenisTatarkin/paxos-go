@@ -28,7 +28,7 @@ func main() {
 
 	//todo: this function should be executed after all proposers connected.
 	//So should be implemented console command "start" or ssomething like that
-	electLeader()
+	electLeader(true)
 
 	go manage()
 
@@ -81,11 +81,19 @@ func manage() {
 	}
 }
 
-func electLeader() {
+func electLeader(initial bool) {
 	h := fnv.New32a()
-	var hashesProposers []node.Proposer = make([]node.Proposer, len(proposers))
+	var hashesProposers []node.Proposer
+	if initial {
+		hashesProposers = make([]node.Proposer, len(proposers))
+	} else {
+		hashesProposers = make([]node.Proposer, len(proposers)-1)
+	}
 
 	for _, proposer := range proposers {
+		if !initial && proposer.Address == leader.Address {
+			continue
+		}
 		h.Write([]byte(proposer.Address))
 		hash := (int)(h.Sum32()) % len(proposers)
 		hashesProposers[hash] = proposer
