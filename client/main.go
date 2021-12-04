@@ -51,10 +51,10 @@ func main() {
 
 	log.Printf("Client estableshed successfully on the port %s", os.Args[1])
 
-	prepareCLI()
+	startCLI()
 }
 
-func prepareCLI() {
+func startCLI() {
 	var cmds = []acmd.Command{
 		{
 			Name:        "propose",
