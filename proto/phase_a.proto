@@ -1,13 +1,20 @@
 syntax = "proto3";
 package paxos;
 
+//Proposer sends to acceptors Prepare message in first phase of protocol.
 message Prepare{
+  //Key of value in proposal.
   string proposal_key = 1;
+  //Version of updating.
   string version = 2;
 }
 
+//Acceptor responses to Proposer by sending Promise.
 message Promise{
+  //Accepted or not by acceptor.
   bool accepted = 1;
+  //Key of value in proposal.
   string proposal_key = 2;
+  //Version of updating.
   string version = 3;
 }

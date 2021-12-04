@@ -1,0 +1,18 @@
+syntax = "proto3";
+package paxos;
+
+//Proposer sends Accept message to acceptors in second phase of protocol.
+message Accept{
+  //Key of value in proposal.
+  string proposal_key = 1;
+  //Value of proposal.
+  string proposal_value = 2;
+  //Version of updating.
+  string version = 3;
+}
+
+//Acceptor responses to proposer with this message.
+message Accepted{
+  //Accepted or not.
+  bool accepted = 1;
+}
