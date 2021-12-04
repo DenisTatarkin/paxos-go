@@ -1,0 +1,13 @@
+syntax = "proto3";
+package paxos;
+
+message Prepare{
+  string proposal_key = 1;
+  string version = 2;
+}
+
+message Promise{
+  bool accepted = 1;
+  string proposal_key = 2;
+  string version = 3;
+}
