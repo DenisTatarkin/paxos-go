@@ -1,0 +1,11 @@
+syntax = "proto3";
+package paxos;
+
+//Client sends proposal to Proposer.
+//Proposer uses proposal to prepare Phase1 and Phase2 messages.
+message Proposal{
+  //Key of value, which should be updated.
+  string key = 1;
+  //New value.
+  string value = 3;
+}
