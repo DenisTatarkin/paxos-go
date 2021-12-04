@@ -1,3 +1,3 @@
-./protoc -I proto proto/proposal.proto --go_out=plugins=grpc:pb/
-./protoc -I proto proto/phase_a.proto --go_out=plugins=grpc:pb/
-./protoc -I proto proto/phase_b.proto --go_out=plugins=grpc:pb/
+for file in proto/*.proto; do
+  ./protoc -I proto $file --go_out=plugins=grpc:pb/
+done
