@@ -1,6 +1,7 @@
 module paxos_go
 
 require (
+	github.com/cristalhq/acmd v0.4.0
 	google.golang.org/grpc v1.24.0
 	google.golang.org/protobuf v1.27.1
 )
@@ -13,8 +14,6 @@ require (
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55 // indirect
 )
 
-replace (
-	google.golang.org/grpc => google.golang.org/grpc v1.27.0
-)
+replace google.golang.org/grpc => google.golang.org/grpc v1.27.0
 
 go 1.17

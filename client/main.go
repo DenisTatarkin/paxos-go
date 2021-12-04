@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/cristalhq/acmd"
 	"log"
 	"os"
 	"strconv"
@@ -12,6 +13,8 @@ import (
 )
 
 const address = "localhost:"
+
+var ctx context.Context
 
 func main() {
 	if len(os.Args) < 2 {
@@ -39,7 +42,8 @@ func main() {
 
 	var client = pb.NewProposalExchangeClient(conn)
 
-	var ctx, cancel = context.WithTimeout(context.Background(), time.Second)
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	//todo: console manage passing
