@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/cristalhq/acmd"
 	"log"
 	"os"
@@ -9,12 +11,13 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
-	pb "paxos_go/pb"
+	"paxos_go/pb"
 )
 
 const address = "localhost:"
 
 var ctx context.Context
+var client pb.ProposalExchangeClient
 
 func main() {
 	if len(os.Args) < 2 {
@@ -40,17 +43,48 @@ func main() {
 		}
 	}()
 
-	var client = pb.NewProposalExchangeClient(conn)
+	client = pb.NewProposalExchangeClient(conn)
 
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	//todo: console manage passing
 	log.Printf("Client estableshed successfully on the port %s", os.Args[1])
-	client.SendProposal(ctx, &pb.Proposal{
-		Key:   "",
-		Value: "",
+
+	prepareCLI()
+}
+
+func prepareCLI() {
+	var cmds = []acmd.Command{
+		{
+			Name:        "propose",
+			Description: "Prepare and send Proposal to proposer",
+			Do:          proposeHandler,
+		},
+	}
+
+	var runner = acmd.RunnerOf(cmds, acmd.Config{
+		AppName: "paxos-cli",
 	})
-	//todo: console manage passing
+
+	if err := runner.Run(); err != nil {
+		panic(err)
+	}
+}
+
+func proposeHandler(_ context.Context, args []string) error {
+	if len(args) < 2 {
+		return errors.New("propose command error: there should be 2 arguments: key and value")
+	}
+
+	var r, err = client.SendProposal(ctx, &pb.Proposal{
+		Key:   os.Args[0],
+		Value: os.Args[1],
+	})
+	if err != nil {
+		return fmt.Errorf("sending proposal error: %v", err.Error())
+	}
+
+	log.Printf("sending proposal is successful: %s", r.Value)
+	return nil
 }
