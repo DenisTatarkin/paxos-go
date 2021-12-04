@@ -1,5 +1,6 @@
 syntax = "proto3";
-package paxos;
+package paxos_go;
+option go_package = "pb/";
 
 service ProposalExchange{
   //Client sends proposal to proposer.

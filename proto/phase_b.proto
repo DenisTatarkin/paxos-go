@@ -1,5 +1,6 @@
 syntax = "proto3";
 package paxos;
+option go_package = "pb/";
 
 service PhaseB{
   //Proposer sends Accept to acceptor and gets Accepted as response.
