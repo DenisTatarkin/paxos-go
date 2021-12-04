@@ -1,6 +1,11 @@
 syntax = "proto3";
 package paxos;
 
+service PhaseB{
+  //Proposer sends Accept to acceptor and gets Accepted as response.
+  rpc sendAccept(Accept) returns (Accepted);
+}
+
 //Proposer sends Accept message to acceptors in second phase of protocol.
 message Accept{
   //Key of value in proposal.

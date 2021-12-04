@@ -1,6 +1,12 @@
 syntax = "proto3";
 package paxos;
 
+service PhaseA{
+  //Proposer sends Prepare to acceptor and gets Promise as response.
+  rpc sendPrepare(Prepare) returns (Promise);
+}
+
+
 //Proposer sends to acceptors Prepare message in first phase of protocol.
 message Prepare{
   //Key of value in proposal.

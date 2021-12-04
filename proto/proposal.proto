@@ -1,6 +1,11 @@
 syntax = "proto3";
 package paxos;
 
+service ProposalExchange{
+  //Client sends proposal to proposer.
+  rpc sendProposal(Proposal) returns (ClientResponse);
+}
+
 //Client sends proposal to Proposer.
 //Proposer uses proposal to prepare Phase1 and Phase2 messages.
 message Proposal{
@@ -8,4 +13,10 @@ message Proposal{
   string key = 1;
   //New value.
   string value = 3;
+}
+
+message ClientResponse{
+  string key = 1;
+  string value = 2;
+  string status = 3;
 }
