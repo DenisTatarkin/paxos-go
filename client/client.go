@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"os"
+	config "paxos_go/client/config"
 	"paxos_go/pb"
 	"time"
 )
@@ -14,6 +15,10 @@ import (
 func Execute(serverAddr string, method string, args []string) error {
 	if len(serverAddr) == 0 || len(method) == 0 || len(args) < 2 {
 		return errors.New("Invalid args number\ncmd proposer_address proposer_method proposal_key proposal_value")
+	}
+
+	if !checkAddress(serverAddr) {
+		return errors.New("Invalid address")
 	}
 
 	conn, err := grpc.Dial(serverAddr, grpc.WithInsecure())
@@ -41,10 +46,25 @@ func Execute(serverAddr string, method string, args []string) error {
 			return err
 		}
 	default:
-		log.Fatalf("No such method: %s", method)
+		return fmt.Errorf("No such method: %s", method)
 	}
 
 	return nil
+}
+
+func checkAddress(addr string) bool {
+	var proposers, err = config.GetProposers()
+	if err != nil {
+		log.Fatalf("Checking proposer in config file error: %v", err)
+	}
+
+	for _, proposer := range proposers {
+		if proposer.Address == addr {
+			return true
+		}
+	}
+
+	return false
 }
 
 func proposeHandler(args []string, ctx context.Context, client pb.ProposalExchangeClient) error {
