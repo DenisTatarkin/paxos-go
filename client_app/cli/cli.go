@@ -2,7 +2,7 @@ package cli
 
 import (
 	"context"
-	"github.com/cristalhq/acmd"
+	"github.com/cristalhq/acmd" //Copyright (c) 2021 cristaltech
 	client "paxos_go/client"
 )
 
