@@ -8,31 +8,22 @@ import (
 	"log"
 	"os"
 	"paxos_go/pb"
-	"strconv"
 	"time"
 )
 
-func Execute(serverAddr string, method string, args []string) {
-	if len(args) < 2 {
-		log.Fatal("Invalid args number\ncmd port_number")
-		return
-	}
-
-	var _, err = strconv.Atoi(args[1])
-	if err != nil {
-		log.Fatal("Invalid args\nPort should be a number")
-		return
+func Execute(serverAddr string, method string, args []string) error {
+	if len(serverAddr) == 0 || len(method) == 0 || len(args) < 2 {
+		return errors.New("Invalid args number\ncmd proposer_address proposer_method proposal_key proposal_value")
 	}
 
 	conn, err := grpc.Dial(serverAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("gRPC connection creating error\n%v", err.Error())
-		return
+		return fmt.Errorf("gRPC connection creating error\n%v", err.Error())
 	}
 	defer func() {
 		err := conn.Close()
 		if err != nil {
-			log.Fatalf("gRPC connection closing error\n%v", err.Error())
+			log.Printf("gRPC connection closing error\n%v", err.Error())
 		}
 	}()
 
@@ -45,10 +36,15 @@ func Execute(serverAddr string, method string, args []string) {
 
 	switch method {
 	case "propose":
-		proposeHandler(args, ctx, client)
+		err := proposeHandler(args, ctx, client)
+		if err != nil {
+			return err
+		}
 	default:
 		log.Fatalf("No such method: %s", method)
 	}
+
+	return nil
 }
 
 func proposeHandler(args []string, ctx context.Context, client pb.ProposalExchangeClient) error {
