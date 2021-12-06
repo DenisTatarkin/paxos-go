@@ -1,6 +1,7 @@
 module paxos_go
 
 require (
+	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/cristalhq/acmd v0.4.0
 	google.golang.org/grpc v1.24.0
 	google.golang.org/protobuf v1.27.1
