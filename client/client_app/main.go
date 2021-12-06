@@ -1,6 +1,6 @@
 package main
 
-import cli "paxos_go/client_app/cli"
+import cli "paxos_go/client/client_app/cli"
 
 func main() {
 	var app cli.CLIapp
