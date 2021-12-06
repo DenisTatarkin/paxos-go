@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"google.golang.org/grpc"
@@ -13,7 +13,7 @@ type server struct {
 	pb.ProposalExchangeServer
 }
 
-func main() {
+func Run() {
 	if len(os.Args) < 2 {
 		log.Fatal("incorrect number of arguments\ncmd port")
 	}
