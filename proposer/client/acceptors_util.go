@@ -48,10 +48,10 @@ func SelectAcceptors() ([]AcceptorServer, error) {
 	return selectedAcceptors, nil
 }
 
-func ChangeAcceptor(acceptor *AcceptorServer, acceptors *[]AcceptorServer) error {
+func ChangeAcceptor(acceptor *AcceptorServer, acceptors *[]AcceptorServer) (*AcceptorServer, error) {
 	var all, err = config.GetAcceptors()
 	if err != nil {
-		return fmt.Errorf("getting acceptors list error:%v", err)
+		return nil, fmt.Errorf("getting acceptors list error:%v", err)
 	}
 
 	var selectFrom = make([]AcceptorServer, 10, 10)
@@ -74,9 +74,9 @@ func ChangeAcceptor(acceptor *AcceptorServer, acceptors *[]AcceptorServer) error
 		newAcceptor = &_newAcceptor
 	}
 	if newAcceptor == nil {
-		return fmt.Errorf("unable to connect to some new acceptor instead of %s", acceptor.Address)
+		return nil, fmt.Errorf("unable to connect to some new acceptor instead of %s", acceptor.Address)
 	}
 
 	linq.From(acceptors).Except(linq.From(acceptor)).Union(linq.From(newAcceptor)).ToSlice(acceptors)
-	return nil
+	return newAcceptor, nil
 }
